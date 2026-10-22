@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSimulator } from '@/context/SimulatorContext';
@@ -12,23 +12,24 @@ import {
   History, 
   GraduationCap, 
   Settings, 
-  ShieldCheck, 
   Wallet,
   Menu,
   X,
-  RotateCcw
+  RotateCcw,
+  Bell,
+  Sparkles
 } from 'lucide-react';
 
 export function Navbar() {
   const pathname = usePathname();
   const { summary, user, setIsResetModalOpen } = useSimulator();
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: TrendingUp },
     { href: '/mercado', label: 'Mercado', icon: Layers },
-    { href: '/custodia', label: 'Minha Custódia', icon: PieChart },
-    { href: '/negociar', label: 'Boleta', icon: Wallet },
+    { href: '/custodia', label: 'Custódia', icon: PieChart },
+    { href: '/negociar', label: 'Negociar', icon: Wallet },
     { href: '/historico', label: 'Extrato', icon: History },
     { href: '/aprender', label: 'Academia', icon: GraduationCap },
   ];
@@ -36,40 +37,44 @@ export function Navbar() {
   const isPublicPage = pathname === '/' || pathname === '/login' || pathname === '/cadastro';
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-fintech-border/80 bg-fintech-dark/95 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 w-full px-4 sm:px-6 lg:px-8 pt-3 pb-2 backdrop-blur-xl bg-[#060A17]/80 border-b border-white/[0.06]">
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between">
         
-        {/* Brand Logo & Educational Tag */}
+        {/* Brand Logo - Nexora Inspired */}
         <div className="flex items-center gap-3">
           <Link href={isPublicPage ? '/' : '/dashboard'} className="flex items-center gap-2.5 group">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900 shadow-md shadow-blue-900/30 border border-blue-400/30 group-hover:scale-105 transition-transform flex-shrink-0">
-              <span className="font-heading font-black text-xl text-white tracking-wider">BC</span>
+            <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-cyan-400 p-[1px] shadow-glow-blue transition-transform group-hover:scale-105 flex-shrink-0">
+              <div className="h-full w-full bg-[#090E23] rounded-[15px] flex items-center justify-center">
+                <span className="font-heading font-black text-sm tracking-tighter text-transparent bg-clip-text bg-gradient-to-tr from-white via-cyan-200 to-blue-400">
+                  BC
+                </span>
+              </div>
             </div>
             <div className="flex flex-col">
-              <span className="font-heading font-bold text-base tracking-tight text-white flex items-center gap-1.5">
+              <span className="font-heading font-black text-base tracking-tight text-white flex items-center gap-1.5 leading-none">
                 Bahia Capital
-                <span className="text-[10px] uppercase font-mono tracking-widest text-blue-400 bg-blue-950/60 px-1.5 py-0.5 rounded border border-blue-800/60">
+                <span className="text-[9px] uppercase font-bold tracking-widest text-cyan-400 bg-cyan-950/60 px-1.5 py-0.5 rounded-full border border-cyan-800/40">
                   Edu
                 </span>
               </span>
-              <span className="text-[11px] font-medium text-slate-400 -mt-0.5">
-                Simulador de Investimentos
+              <span className="text-[10px] font-medium text-slate-400 mt-0.5">
+                Investment Simulator
               </span>
             </div>
           </Link>
 
-          {/* Persistent Simulation Badge - Anti-Glitch Fix: Never breaks words, perfect dot alignment */}
-          <div className="hidden lg:flex items-center">
-            <span className="inline-flex items-center gap-2 whitespace-nowrap px-3 py-1 text-xs font-semibold rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25 shadow-sm">
-              <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
-              <span>Ambiente Simulado • Sem Risco Real</span>
+          {/* Persistent Simulation Badge - Anti-Glitch Fix */}
+          <div className="hidden lg:flex items-center ml-2">
+            <span className="inline-flex items-center gap-2 whitespace-nowrap px-3 py-1 text-[11px] font-semibold rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 shadow-sm backdrop-blur-md">
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse flex-shrink-0" />
+              <span>Ambiente Simulado • Sem Risco</span>
             </span>
           </div>
         </div>
 
-        {/* Desktop Navigation Links */}
+        {/* Desktop Navigation Links - Floating Pill Style */}
         {!isPublicPage && (
-          <nav className="hidden md:flex items-center gap-1 lg:gap-2">
+          <nav className="hidden md:flex items-center gap-1 bg-white/[0.03] p-1.5 rounded-2xl border border-white/[0.08] backdrop-blur-xl">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
@@ -77,13 +82,13 @@ export function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
+                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
                     isActive
-                      ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 shadow-sm'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-glow-blue'
+                      : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
                   }`}
                 >
-                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  <Icon className="h-3.5 w-3.5 flex-shrink-0" />
                   <span>{link.label}</span>
                 </Link>
               );
@@ -92,25 +97,25 @@ export function Navbar() {
         )}
 
         {/* Right Section: Balance Chip & Profile Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {!isPublicPage ? (
             <>
-              {/* Financial Balance Chip - Glitch-Free & WCAG AA compliant */}
-              <div className="hidden sm:flex items-center gap-3 px-3.5 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 shadow-inner">
+              {/* Financial Balance Chip */}
+              <div className="hidden sm:flex items-center gap-3 px-3.5 py-1.5 rounded-2xl bg-white/[0.04] border border-white/[0.08] backdrop-blur-md">
                 <div className="flex flex-col text-right">
-                  <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">
-                    Patrimônio Total
+                  <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">
+                    Total Carteira
                   </span>
-                  <span className="text-sm font-bold text-white tracking-tight">
+                  <span className="text-xs font-black text-white font-mono tracking-tight">
                     {formatCurrency(summary.total)}
                   </span>
                 </div>
-                <div className="h-7 w-[1px] bg-slate-700" />
+                <div className="h-6 w-[1px] bg-white/[0.1]" />
                 <div className="flex flex-col text-right">
-                  <span className="text-[10px] uppercase font-semibold text-emerald-400 tracking-wider">
-                    Caixa Livre
+                  <span className="text-[9px] uppercase font-bold text-emerald-400 tracking-wider">
+                    Disponível
                   </span>
-                  <span className="text-sm font-bold text-emerald-400 tracking-tight">
+                  <span className="text-xs font-black text-emerald-400 font-mono tracking-tight">
                     {formatCurrency(summary.cash)}
                   </span>
                 </div>
@@ -121,35 +126,45 @@ export function Navbar() {
                 type="button"
                 onClick={() => setIsResetModalOpen(true)}
                 title="Zerar carteira e reiniciar com R$ 10.000"
-                className="p-2 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/20 transition-colors"
+                className="p-2 rounded-xl text-slate-400 hover:text-amber-400 bg-white/[0.03] hover:bg-amber-500/10 border border-white/[0.08] hover:border-amber-500/25 transition-all"
                 aria-label="Reiniciar simulação"
               >
                 <RotateCcw className="h-4 w-4" />
               </button>
 
+              {/* Notification icon */}
+              <button
+                type="button"
+                className="p-2 rounded-xl text-slate-400 hover:text-white bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] transition-all"
+                aria-label="Notificações"
+              >
+                <Bell className="h-4 w-4" />
+              </button>
+
               {/* User Avatar & Settings Link */}
               <Link
                 href="/configuracoes"
-                className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-800/60 transition-colors"
+                className="flex items-center gap-2 p-1 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] transition-all"
               >
-                <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-blue-500/30 flex-shrink-0">
+                <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white font-bold text-xs ring-1 ring-white/20 flex-shrink-0">
                   {user.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
                 </div>
               </Link>
             </>
           ) : (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <Link
                 href="/login"
-                className="text-sm font-medium text-slate-300 hover:text-white px-3 py-2"
+                className="text-xs font-bold text-slate-300 hover:text-white px-3 py-2 rounded-xl transition-colors"
               >
                 Entrar
               </Link>
               <Link
                 href="/cadastro"
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-lg shadow-md shadow-blue-900/30 transition-all hover:shadow-blue-700/50"
+                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl shadow-glow-blue hover:opacity-95 transition-all"
               >
-                <span>Criar Conta Gratuita</span>
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Iniciar Grátis</span>
               </Link>
             </div>
           )}
@@ -158,8 +173,8 @@ export function Navbar() {
           {!isPublicPage && (
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg"
-              aria-label="Abrir menu de navegação"
+              className="md:hidden p-2 text-slate-300 hover:text-white bg-white/[0.05] rounded-xl border border-white/[0.08]"
+              aria-label="Abrir menu"
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -169,27 +184,19 @@ export function Navbar() {
 
       {/* Mobile Drawer */}
       {!isPublicPage && mobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-800 bg-fintech-dark/98 px-4 py-3 space-y-2">
-          {/* Mobile Balance display */}
-          <div className="flex items-center justify-between p-3 rounded-xl bg-slate-800/80 border border-slate-700">
+        <div className="md:hidden mt-2 p-4 rounded-3xl bg-[#090E23]/95 border border-white/[0.1] backdrop-blur-2xl space-y-3">
+          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
             <div>
-              <div className="text-xs text-slate-400">Patrimônio Total</div>
-              <div className="text-base font-bold text-white">{formatCurrency(summary.total)}</div>
+              <div className="text-[10px] uppercase font-bold text-slate-400">Patrimônio</div>
+              <div className="text-sm font-black text-white font-mono">{formatCurrency(summary.total)}</div>
             </div>
             <div className="text-right">
-              <div className="text-xs text-emerald-400">Disponível</div>
-              <div className="text-base font-bold text-emerald-400">{formatCurrency(summary.cash)}</div>
+              <div className="text-[10px] uppercase font-bold text-emerald-400">Caixa Livre</div>
+              <div className="text-sm font-black text-emerald-400 font-mono">{formatCurrency(summary.cash)}</div>
             </div>
           </div>
 
-          <div className="py-1">
-            <span className="inline-flex w-full items-center justify-center gap-2 whitespace-nowrap px-3 py-1.5 text-xs font-semibold rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25">
-              <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
-              <span>Ambiente Simulado • Sem Risco Real</span>
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 pt-2">
+          <div className="grid grid-cols-2 gap-2">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const isActive = pathname === link.href;
@@ -198,34 +205,34 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-2 px-3 py-2.5 text-sm font-medium rounded-lg ${
+                  className={`flex items-center gap-2 px-3 py-2.5 text-xs font-bold rounded-xl ${
                     isActive
-                      ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
-                      : 'text-slate-300 hover:bg-slate-800'
+                      ? 'bg-blue-600 text-white shadow-glow-blue'
+                      : 'text-slate-300 bg-white/[0.03] hover:bg-white/[0.08]'
                   }`}
                 >
-                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  <Icon className="h-4 w-4" />
                   <span>{link.label}</span>
                 </Link>
               );
             })}
           </div>
 
-          <div className="pt-2 border-t border-slate-800 flex justify-between items-center">
+          <div className="pt-2 border-t border-white/[0.08] flex justify-between items-center text-xs">
             <Link
               href="/configuracoes"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 text-sm text-slate-300 hover:text-white"
+              className="text-slate-300 hover:text-white flex items-center gap-1.5 font-medium"
             >
-              <Settings className="h-4 w-4" />
-              <span>Configurações & Perfil</span>
+              <Settings className="h-3.5 w-3.5" />
+              <span>Configurações</span>
             </Link>
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
                 setIsResetModalOpen(true);
               }}
-              className="text-xs text-amber-400 hover:underline flex items-center gap-1"
+              className="text-amber-400 hover:underline flex items-center gap-1 font-bold"
             >
               <RotateCcw className="h-3 w-3" />
               <span>Reset R$ 10.000</span>

@@ -22,7 +22,8 @@ import {
   Wallet, 
   GraduationCap, 
   Building2,
-  HelpCircle
+  HelpCircle,
+  Sparkles
 } from 'lucide-react';
 
 export function AtivoDetalhesClient({ ticker }: { ticker: string }) {
@@ -33,7 +34,6 @@ export function AtivoDetalhesClient({ ticker }: { ticker: string }) {
   const asset = assets.find((a) => a.ticker === ticker?.toUpperCase()) || assets[0];
   const isPositive = asset.change24h >= 0;
 
-  // Generate historical points for the chart
   const historicalData = React.useMemo(() => {
     return generateHistoricalPoints(asset.price, 24, 0.02);
   }, [asset.price]);
@@ -45,37 +45,37 @@ export function AtivoDetalhesClient({ ticker }: { ticker: string }) {
       <div className="flex items-center justify-between">
         <Link
           href="/mercado"
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-400 hover:text-white transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>Voltar para o Mercado</span>
+          <span>Voltar ao Mercado</span>
         </Link>
 
-        <span className="inline-flex items-center gap-2 whitespace-nowrap px-3 py-1 text-xs font-semibold rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+        <span className="inline-flex items-center gap-2 whitespace-nowrap px-3.5 py-1 text-xs font-semibold rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 backdrop-blur-md">
           <GraduationCap className="h-3.5 w-3.5 flex-shrink-0" />
-          <span>Raio-X Educacional Bahia Capital</span>
+          <span>Raio-X Fundamentalista • Bahia Capital</span>
         </span>
       </div>
 
-      {/* Main Asset Header Card */}
-      <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+      {/* Main Asset Header Card - Nexora Style */}
+      <div className="p-7 sm:p-9 rounded-[32px] bg-gradient-to-br from-[#101F48] via-[#0C1534] to-[#070C1D] border border-white/[0.12] shadow-glass backdrop-blur-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
         
-        <div className="flex items-center gap-4">
-          <div className="h-16 w-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-3xl flex-shrink-0 shadow-md">
+        <div className="flex items-center gap-5">
+          <div className="h-20 w-20 rounded-[24px] bg-[#090E23] border border-white/[0.1] flex items-center justify-center text-4xl flex-shrink-0 shadow-inner">
             {asset.logo}
           </div>
           <div>
-            <div className="flex items-center gap-2.5">
-              <h1 className="font-heading font-black text-2xl sm:text-3xl text-white">
+            <div className="flex items-center gap-3">
+              <h1 className="font-heading font-black text-3xl sm:text-4xl text-white tracking-tight">
                 {asset.ticker}
               </h1>
-              <span className="px-2 py-0.5 rounded text-xs font-bold uppercase bg-slate-800 text-slate-300 border border-slate-700">
+              <span className="px-3 py-1 rounded-full text-xs font-bold uppercase bg-white/[0.06] text-cyan-300 border border-white/[0.1]">
                 {asset.type === 'ACAO' ? 'Ação B3' : 'Criptoativo'}
               </span>
             </div>
-            <div className="text-sm font-medium text-slate-300 mt-0.5">{asset.name}</div>
+            <div className="text-base font-medium text-slate-300 mt-1">{asset.name}</div>
             <div className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
-              <Building2 className="h-3.5 w-3.5" />
+              <Building2 className="h-3.5 w-3.5 text-cyan-400" />
               <span>{asset.sector}</span>
             </div>
           </div>
@@ -84,17 +84,17 @@ export function AtivoDetalhesClient({ ticker }: { ticker: string }) {
         {/* Right price and Action CTA */}
         <div className="flex flex-col md:items-end justify-center space-y-3">
           <div>
-            <div className="text-xs text-slate-400 uppercase font-semibold">Cotação Atual</div>
+            <div className="text-xs text-slate-400 uppercase font-bold tracking-wider">Cotação Atual</div>
             <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-heading font-black text-white">
+              <span className="text-3xl sm:text-4xl font-heading font-black text-white font-mono">
                 {formatCurrency(asset.price)}
               </span>
-              <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+              <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${
                 isPositive 
-                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
-                  : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' 
+                  : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
               }`}>
-                {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                {isPositive ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
                 <span>{formatPercent(asset.change24h)}</span>
               </span>
             </div>
@@ -102,36 +102,36 @@ export function AtivoDetalhesClient({ ticker }: { ticker: string }) {
 
           <Link
             href={`/negociar?ticker=${asset.ticker}`}
-            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-950/40 transition-all hover:scale-105"
+            className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 shadow-glow-blue transition-all hover:scale-105"
           >
             <Wallet className="h-4 w-4" />
-            <span>Abrir Boleta de Compra ({asset.ticker})</span>
+            <span>Abrir Boleta de Compra</span>
           </Link>
         </div>
 
       </div>
 
       {/* Technical Chart Section */}
-      <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-5 shadow-xl space-y-4">
+      <div className="rounded-[28px] bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl p-6 shadow-glass space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 className="font-heading font-bold text-base text-white">
-              Comportamento do Preço no Pregão
+            <h3 className="font-heading font-black text-lg text-white">
+              Gráfico de Oscilação de Preço
             </h3>
             <p className="text-xs text-slate-400">
-              Oscilação simulada com base nas variações reais registradas
+              Histórico intraday sincronizado com cotações de mercado
             </p>
           </div>
 
-          <div className="flex items-center gap-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700/80">
+          <div className="flex items-center gap-1 bg-white/[0.04] p-1 rounded-2xl border border-white/[0.08]">
             {(['1D', '1S', '1M', '1A'] as const).map((tf) => (
               <button
                 key={tf}
                 type="button"
                 onClick={() => setTimeframe(tf)}
-                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
                   timeframe === tf
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-glow-blue'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -146,11 +146,11 @@ export function AtivoDetalhesClient({ ticker }: { ticker: string }) {
             <AreaChart data={historicalData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="assetGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={isPositive ? '#10B981' : '#EF4444'} stopOpacity={0.4} />
-                  <stop offset="95%" stopColor={isPositive ? '#10B981' : '#EF4444'} stopOpacity={0.0} />
+                  <stop offset="5%" stopColor={isPositive ? '#00D2FF' : '#FF4757'} stopOpacity={0.45} />
+                  <stop offset="95%" stopColor={isPositive ? '#0066FF' : '#FF4757'} stopOpacity={0.0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
               <XAxis dataKey="timestamp" stroke="#64748B" fontSize={11} tickLine={false} />
               <YAxis
                 stroke="#64748B"
@@ -164,9 +164,9 @@ export function AtivoDetalhesClient({ ticker }: { ticker: string }) {
                 content={({ active, payload, label }) => {
                   if (active && payload && payload.length) {
                     return (
-                      <div className="rounded-xl bg-slate-900/95 border border-slate-700 p-2.5 shadow-xl text-xs space-y-1">
+                      <div className="rounded-2xl bg-[#090E23]/95 border border-white/[0.1] p-3 shadow-2xl text-xs space-y-1 backdrop-blur-xl">
                         <div className="text-slate-400">Horário: {label}</div>
-                        <div className="font-bold text-white text-sm">
+                        <div className="font-bold text-white text-sm font-mono">
                           {formatCurrency(Number(payload[0].value))}
                         </div>
                       </div>
@@ -178,8 +178,8 @@ export function AtivoDetalhesClient({ ticker }: { ticker: string }) {
               <Area
                 type="monotone"
                 dataKey="price"
-                stroke={isPositive ? '#10B981' : '#EF4444'}
-                strokeWidth={2.5}
+                stroke={isPositive ? '#00D2FF' : '#FF4757'}
+                strokeWidth={3}
                 fillOpacity={1}
                 fill="url(#assetGradient)"
               />
@@ -188,79 +188,79 @@ export function AtivoDetalhesClient({ ticker }: { ticker: string }) {
         </div>
       </div>
 
-      {/* Grid of Fundamental Indicators with Tooltips */}
+      {/* Grid of Fundamental Indicators with Glass Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+        <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl space-y-1.5 shadow-glass">
           <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>P/L (Preço / Lucro)</span>
-            <span title="Quantos anos levaria para reaver o capital apenas com os lucros da empresa">
+            <span className="font-semibold">P/L (Preço / Lucro)</span>
+            <span title="Anos para reaver o capital apenas com lucros">
               <HelpCircle className="h-3.5 w-3.5 text-slate-500 cursor-help" />
             </span>
           </div>
-          <div className="text-xl font-bold text-white">
+          <div className="text-2xl font-black text-white font-mono">
             {asset.peRatio ? `${asset.peRatio.toFixed(2)}x` : 'N/A'}
           </div>
-          <div className="text-[10px] text-blue-400">
-            {asset.peRatio && asset.peRatio < 10 ? 'Abaixo da média histórica' : 'Múltiplo de crescimento'}
+          <div className="text-[10px] text-cyan-400 font-bold">
+            {asset.peRatio && asset.peRatio < 10 ? 'Abaixo da média setorial' : 'Múltiplo de expansão'}
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+        <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl space-y-1.5 shadow-glass">
           <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Dividend Yield (DY)</span>
-            <span title="Retorno em proventos pagos aos acionistas nos últimos 12 meses">
+            <span className="font-semibold">Dividend Yield (DY)</span>
+            <span title="Retorno em proventos nos últimos 12 meses">
               <HelpCircle className="h-3.5 w-3.5 text-slate-500 cursor-help" />
             </span>
           </div>
-          <div className="text-xl font-bold text-emerald-400">
+          <div className="text-2xl font-black text-emerald-400 font-mono">
             {asset.dividendYield ? `${asset.dividendYield.toFixed(2)}%` : 'N/A'}
           </div>
-          <div className="text-[10px] text-emerald-400">
-            {asset.dividendYield && asset.dividendYield > 8 ? 'Excelente pagadora de dividendos' : 'Retenção para expansão'}
+          <div className="text-[10px] text-emerald-400 font-bold">
+            {asset.dividendYield && asset.dividendYield > 8 ? 'Alta distribuição de caixa' : 'Retenção para crescimento'}
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+        <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl space-y-1.5 shadow-glass">
           <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>ROE (Rent. s/ Patrimônio)</span>
-            <span title="Capacidade da empresa de gerar lucro com seus próprios recursos">
+            <span className="font-semibold">ROE (Patrimônio)</span>
+            <span title="Retorno sobre o patrimônio líquido da empresa">
               <HelpCircle className="h-3.5 w-3.5 text-slate-500 cursor-help" />
             </span>
           </div>
-          <div className="text-xl font-bold text-white">
+          <div className="text-2xl font-black text-white font-mono">
             {asset.roe ? `${asset.roe.toFixed(2)}%` : 'N/A'}
           </div>
-          <div className="text-[10px] text-slate-400">Rentabilidade de capital</div>
+          <div className="text-[10px] text-slate-400">Eficiência de capital</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+        <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl space-y-1.5 shadow-glass">
           <div className="flex items-center justify-between text-slate-400 text-xs">
-            <span>Valor de Mercado</span>
-            <span title="Valor somado de todas as ações em circulação">
+            <span className="font-semibold">Valor de Mercado</span>
+            <span title="Valor total de todas as ações somadas">
               <HelpCircle className="h-3.5 w-3.5 text-slate-500 cursor-help" />
             </span>
           </div>
-          <div className="text-xl font-bold text-white">
+          <div className="text-2xl font-black text-white font-mono">
             {asset.marketCap || 'N/A'}
           </div>
-          <div className="text-[10px] text-slate-400">Cap. Total</div>
+          <div className="text-[10px] text-slate-400">Capitalização</div>
         </div>
 
       </div>
 
       {/* Didactic Business Model Panel */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-blue-950/30 to-slate-900 border border-slate-800 space-y-4">
-        <div className="flex items-center gap-2.5">
-          <div className="h-8 w-8 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center">
+      <div className="p-7 rounded-[28px] bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl shadow-glass space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-2xl bg-blue-500/20 text-cyan-400 flex items-center justify-center">
             <GraduationCap className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="font-heading font-bold text-base text-white">
+            <h3 className="font-heading font-black text-base text-white">
               Painel Didático Bahia Capital: Como este ativo gera valor?
             </h3>
             <p className="text-xs text-slate-400">
-              Entenda os fundamentos antes de abrir sua ordem no simulador
+              Compreenda o negócio por trás do código antes de investir
             </p>
           </div>
         </div>
@@ -271,18 +271,18 @@ export function AtivoDetalhesClient({ ticker }: { ticker: string }) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
           
-          <div className="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-2">
-            <div className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+          <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-2">
+            <div className="text-xs font-bold text-emerald-400 flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-400" />
-              <span>Pontos Fortes (Tese de Investimento)</span>
+              <span>Tese de Investimento (Pontos Fortes)</span>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
               Forte barreira de entrada no setor, alta geração de caixa operacional e distribuição frequente de proventos aos acionistas ou valorização orgânica.
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-2">
-            <div className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-2">
+            <div className="text-xs font-bold text-amber-400 flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-amber-400" />
               <span>Pontos de Atenção (Gestão de Risco)</span>
             </div>

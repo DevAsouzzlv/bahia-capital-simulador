@@ -11,10 +11,7 @@ import {
   BookOpen, 
   Search, 
   Sparkles, 
-  ArrowRight, 
-  ShieldCheck, 
-  PlayCircle,
-  HelpCircle
+  ArrowRight
 } from 'lucide-react';
 
 const GLOSSARY_TERMS = [
@@ -59,7 +56,6 @@ const GLOSSARY_TERMS = [
 export default function AcademiaPage() {
   const { user, missions } = useSimulator();
   const [glossarySearch, setGlossarySearch] = useState('');
-  const [selectedTrack, setSelectedTrack] = useState<string | null>(null);
 
   const completedCount = missions.filter((m) => m.completed).length;
   const progressPercent = (completedCount / missions.length) * 100;
@@ -74,45 +70,45 @@ export default function AcademiaPage() {
   return (
     <div className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8">
       
-      {/* Header with Gamified Progress Bar */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 border border-blue-500/30 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+      {/* Header with Gamified Progress Bar - Nexora Style */}
+      <div className="p-7 sm:p-9 rounded-[32px] bg-gradient-to-br from-[#101F48] via-[#0C1534] to-[#070C1D] border border-white/[0.12] shadow-glass backdrop-blur-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
         
-        <div className="flex items-center gap-4">
-          <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white shadow-lg shadow-amber-900/40 flex-shrink-0">
-            <Award className="h-8 w-8 text-amber-200" />
+        <div className="flex items-center gap-5">
+          <div className="h-20 w-20 rounded-[24px] bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white shadow-lg shadow-amber-950/50 flex-shrink-0">
+            <Award className="h-10 w-10 text-amber-200" />
           </div>
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">
                 Academia Bahia Capital
               </span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-500/20 text-blue-300">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-white/[0.06] text-cyan-300 border border-white/[0.1]">
                 Gamificação Ativa
               </span>
             </div>
-            <h1 className="font-heading font-black text-2xl text-white">
+            <h1 className="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight">
               {user.level}
             </h1>
             <p className="text-xs text-slate-300">
-              Você possui <strong className="text-amber-400 font-bold">{user.xp} XP</strong> acumulados através de práticas simuladas.
+              Você possui <strong className="text-amber-400 font-bold font-mono">{user.xp} XP</strong> acumulados através de operações simuladas.
             </p>
           </div>
         </div>
 
         {/* Level Progress */}
-        <div className="w-full md:w-72 space-y-2 bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
+        <div className="w-full md:w-80 space-y-2 bg-white/[0.04] p-5 rounded-2xl border border-white/[0.08] backdrop-blur-md">
           <div className="flex justify-between text-xs">
-            <span className="text-slate-400 font-medium">Progresso das Missões:</span>
+            <span className="text-slate-400 font-medium">Missões Práticas:</span>
             <span className="font-bold text-emerald-400">{completedCount}/{missions.length} completas</span>
           </div>
-          <div className="h-2.5 w-full bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-2.5 w-full bg-white/[0.06] rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-blue-500 to-emerald-400 transition-all duration-500 rounded-full"
+              className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500 rounded-full"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
           <div className="text-[10px] text-slate-400 text-right">
-            Próximo nível com 500 XP: <strong>Investidor Estrategista</strong>
+            Próximo nível com 500 XP: <strong className="text-white">Investidor Estrategista</strong>
           </div>
         </div>
 
@@ -122,37 +118,36 @@ export default function AcademiaPage() {
       <div className="space-y-4">
         <div>
           <h2 className="font-heading font-black text-xl text-white flex items-center gap-2">
-            <GraduationCap className="h-5 w-5 text-blue-400" />
-            <span>Trilhas Práticas de Treinamento</span>
+            <GraduationCap className="h-5 w-5 text-cyan-400" />
+            <span>Trilhas Práticas de Aprendizado</span>
           </h2>
           <p className="text-xs text-slate-400">
-            Passo a passo com missões pedagógicas para perder o medo e ganhar confiança
+            Missões graduais para perder o medo e ganhar confiança técnica no pregão
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
-          {/* Trilha 1 */}
-          <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-blue-500/40 transition-all space-y-4 flex flex-col justify-between">
+          <div className="p-7 rounded-[28px] bg-white/[0.03] border border-white/[0.08] hover:border-cyan-400/40 backdrop-blur-xl transition-all space-y-4 flex flex-col justify-between shadow-glass">
             <div className="space-y-2">
-              <span className="text-[10px] uppercase font-bold text-blue-400 tracking-wider">
-                Módulo 1 • Fundamentos
+              <span className="text-[10px] uppercase font-bold text-cyan-400 tracking-wider">
+                Módulo 1 • B3
               </span>
-              <h3 className="font-heading font-bold text-lg text-white">
-                Primeiros Passos na B3
+              <h3 className="font-heading font-black text-lg text-white">
+                Primeiros Passos na Bolsa
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Aprenda o que é um ticker, como funcionam as ações ordinárias e preferenciais, e realize sua primeira compra sem risco.
+                Aprenda a anatomia dos tickers (PETR4, VALE3, WEGE3), lote padrão e realize sua primeira compra sem risco.
               </p>
             </div>
-            <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
-              <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1">
+            <div className="pt-4 border-t border-white/[0.08] flex items-center justify-between">
+              <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
                 <CheckCircle2 className="h-3.5 w-3.5" />
-                <span>3/3 Aulas Práticas</span>
+                <span>3/3 Concluídas</span>
               </span>
               <Link
                 href="/negociar?ticker=PETR4"
-                className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                className="text-xs font-bold text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
               >
                 <span>Praticar</span>
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -160,21 +155,20 @@ export default function AcademiaPage() {
             </div>
           </div>
 
-          {/* Trilha 2 */}
-          <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/40 transition-all space-y-4 flex flex-col justify-between">
+          <div className="p-7 rounded-[28px] bg-white/[0.03] border border-white/[0.08] hover:border-amber-400/40 backdrop-blur-xl transition-all space-y-4 flex flex-col justify-between shadow-glass">
             <div className="space-y-2">
               <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">
-                Módulo 2 • Mercado Cripto
+                Módulo 2 • Criptoativos
               </span>
-              <h3 className="font-heading font-bold text-lg text-white">
+              <h3 className="font-heading font-black text-lg text-white">
                 Cripto sem Mistério e Risco
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Entenda a volatilidade do Bitcoin e Ethereum, por que frações de moedas são negociadas e como calibrar posições pequenas.
+                Entenda a volatilidade do Bitcoin e Ethereum, frações de Satoshi e como controlar posições reduzidas.
               </p>
             </div>
-            <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
-              <span className="text-xs text-amber-400 font-semibold flex items-center gap-1">
+            <div className="pt-4 border-t border-white/[0.08] flex items-center justify-between">
+              <span className="text-xs text-amber-400 font-bold flex items-center gap-1">
                 <Sparkles className="h-3.5 w-3.5" />
                 <span>Em Andamento</span>
               </span>
@@ -188,20 +182,19 @@ export default function AcademiaPage() {
             </div>
           </div>
 
-          {/* Trilha 3 */}
-          <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 transition-all space-y-4 flex flex-col justify-between">
+          <div className="p-7 rounded-[28px] bg-white/[0.03] border border-white/[0.08] hover:border-emerald-400/40 backdrop-blur-xl transition-all space-y-4 flex flex-col justify-between shadow-glass">
             <div className="space-y-2">
               <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
                 Módulo 3 • Estratégia
               </span>
-              <h3 className="font-heading font-bold text-lg text-white">
-                Construindo a Carteira Anti-Crise
+              <h3 className="font-heading font-black text-lg text-white">
+                Carteira Blindada Anti-Crise
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Aprenda a fórmula da diversificação entre ações perenes pagadoras de dividendos, reserva de liquidez e proteção patrimonial.
+                Aprenda a fórmula da diversificação entre ações de dividendos, caixa tático e proteção patrimonial.
               </p>
             </div>
-            <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
+            <div className="pt-4 border-t border-white/[0.08] flex items-center justify-between">
               <span className="text-xs text-slate-400 font-medium">Recomendado</span>
               <Link
                 href="/custodia"
@@ -217,33 +210,33 @@ export default function AcademiaPage() {
       </div>
 
       {/* Gamified Missions Checklist */}
-      <div id="missoes" className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 shadow-xl space-y-4">
+      <div id="missoes" className="rounded-[28px] bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl p-7 shadow-glass space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="font-heading font-bold text-base text-white flex items-center gap-2">
+            <h2 className="font-heading font-black text-lg text-white flex items-center gap-2">
               <Award className="h-5 w-5 text-amber-400" />
               <span>Checklist de Missões do Aluno</span>
             </h2>
             <p className="text-xs text-slate-400">
-              Cumpra objetivos na plataforma para destravar conquistas e pontos de experiência
+              Cumpra objetivos na plataforma para destravar conquistas e subir de nível
             </p>
           </div>
-          <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
-            Recompensa Total: 600 XP
+          <span className="text-xs font-bold text-amber-300 bg-amber-500/10 px-3.5 py-1.5 rounded-full border border-amber-500/25">
+            +600 XP Disponíveis
           </span>
         </div>
 
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           {missions.map((mission) => (
             <div
               key={mission.id}
-              className={`p-4 rounded-xl border flex items-center justify-between gap-4 transition-colors ${
+              className={`p-4 rounded-2xl border flex items-center justify-between gap-4 transition-all ${
                 mission.completed
-                  ? 'bg-slate-950/60 border-slate-800/80 text-slate-300'
-                  : 'bg-slate-800/40 border-slate-700 text-white'
+                  ? 'bg-black/30 border-white/[0.05] text-slate-400'
+                  : 'bg-white/[0.04] border-white/[0.1] text-white hover:bg-white/[0.06]'
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3.5">
                 {mission.completed ? (
                   <CheckCircle2 className="h-5 w-5 text-emerald-400 flex-shrink-0" />
                 ) : (
@@ -258,7 +251,7 @@ export default function AcademiaPage() {
               </div>
 
               <div className="flex items-center gap-3 flex-shrink-0">
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold">
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 text-xs font-bold font-mono">
                   <Sparkles className="h-3 w-3" />
                   <span>+{mission.xpReward} XP</span>
                 </span>
@@ -267,9 +260,9 @@ export default function AcademiaPage() {
                 ) : (
                   <Link
                     href="/mercado"
-                    className="text-xs font-bold text-blue-400 hover:underline hidden sm:inline"
+                    className="text-xs font-bold text-cyan-400 hover:underline hidden sm:inline"
                   >
-                    Executar Missão
+                    Executar
                   </Link>
                 )}
               </div>
@@ -278,16 +271,16 @@ export default function AcademiaPage() {
         </div>
       </div>
 
-      {/* Financial Glossary with Search */}
-      <div id="glossario" className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 shadow-xl space-y-4">
+      {/* Financial Glossary */}
+      <div id="glossario" className="rounded-[28px] bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl p-7 shadow-glass space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="font-heading font-bold text-base text-white flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-emerald-400" />
-              <span>Glossário Financeiro Descomplicado</span>
+            <h2 className="font-heading font-black text-lg text-white flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-cyan-400" />
+              <span>Glossário Descomplicado</span>
             </h2>
             <p className="text-xs text-slate-400">
-              Termos do mercado explicados em linguagem simples para você nunca mais se sentir perdido
+              Termos do mercado traduzidos em linguagem simples para iniciantes
             </p>
           </div>
 
@@ -297,8 +290,8 @@ export default function AcademiaPage() {
               type="text"
               value={glossarySearch}
               onChange={(e) => setGlossarySearch(e.target.value)}
-              placeholder="Buscar termo (ex: P/L, Yield, Halving)..."
-              className="w-full rounded-xl bg-slate-800 border border-slate-700 pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              placeholder="Buscar termo (P/L, Yield, Halving)..."
+              className="w-full rounded-2xl bg-white/[0.04] border border-white/[0.1] pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400"
             />
           </div>
         </div>
@@ -307,18 +300,18 @@ export default function AcademiaPage() {
           {filteredGlossary.map((item) => (
             <div
               key={item.term}
-              className="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-2 hover:border-slate-600 transition-colors"
+              className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] space-y-2 hover:border-cyan-400/40 transition-colors shadow-glass"
             >
               <div className="flex items-center justify-between">
                 <h4 className="font-bold text-white text-sm">{item.term}</h4>
-                <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800">
+                <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-white/[0.06] text-cyan-300 border border-white/[0.08]">
                   {item.category}
                 </span>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed">
                 {item.definition}
               </p>
-              <div className="p-2.5 rounded-lg bg-blue-950/40 border border-blue-900/40 text-[11px] text-blue-200">
+              <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-800/30 text-[11px] text-cyan-200">
                 <strong>Exemplo Prático:</strong> {item.tip}
               </div>
             </div>

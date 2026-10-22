@@ -3,15 +3,13 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSimulator } from '@/context/SimulatorContext';
-import { OrderType, Asset } from '@/types';
+import { OrderType } from '@/types';
 import { formatCurrency, formatPercent } from '@/utils/formatters';
 import { 
   ArrowLeft, 
   Wallet, 
   CheckCircle2, 
   AlertTriangle, 
-  ShieldCheck, 
-  Sparkles, 
   TrendingUp, 
   RotateCcw,
   GraduationCap
@@ -38,12 +36,10 @@ function BoletaContent() {
   const numericQty = parseFloat(quantity) || 0;
   const totalOrderValue = numericQty * asset.price;
 
-  // Portfolio impact calculation
   const totalPortfolio = summary.total > 0 ? summary.total : 10000;
   const portfolioImpactPercent = (totalOrderValue / totalPortfolio) * 100;
   const isHighRisk = portfolioImpactPercent > 25 && orderType === 'COMPRA';
 
-  // Percentage shortcuts
   const handlePercentClick = (percent: number) => {
     if (orderType === 'COMPRA') {
       const availableFunds = summary.cash * (percent / 100);
@@ -96,41 +92,41 @@ function BoletaContent() {
       <div className="flex items-center justify-between">
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-400 hover:text-white"
+          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-400 hover:text-white transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Voltar</span>
         </button>
 
-        <span className="inline-flex items-center gap-2 whitespace-nowrap px-3 py-1 text-xs font-semibold rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25">
-          <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
-          <span>Boleta Simulada • Corretagem Zero</span>
+        <span className="inline-flex items-center gap-2 whitespace-nowrap px-3.5 py-1 text-xs font-semibold rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 backdrop-blur-md">
+          <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse flex-shrink-0" />
+          <span>Terminal de Negociação • Taxa Zero</span>
         </span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
         
-        {/* Left Column: Trading Form */}
-        <div className="md:col-span-7 rounded-2xl bg-slate-900/90 border border-slate-800 p-6 shadow-2xl space-y-6">
+        {/* Left Column: Trading Form (7 cols) */}
+        <div className="md:col-span-7 rounded-[32px] bg-white/[0.03] border border-white/[0.08] backdrop-blur-2xl p-7 shadow-glass space-y-6">
           
           <div>
-            <h1 className="font-heading font-black text-2xl text-white">
-              Terminal de Negociação
+            <h1 className="font-heading font-black text-2xl text-white tracking-tight">
+              Boleta de Negociação
             </h1>
             <p className="text-xs text-slate-400 mt-0.5">
-              Execute compras e vendas com cálculo automático de risco
+              Execute ordens simuladas com cálculo em tempo real
             </p>
           </div>
 
-          {/* Buy / Sell Tabs */}
-          <div className="grid grid-cols-2 gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+          {/* Buy / Sell Tabs - Nexora Segmented */}
+          <div className="grid grid-cols-2 gap-2 bg-black/40 p-1.5 rounded-2xl border border-white/[0.08]">
             <button
               type="button"
               onClick={() => { setOrderType('COMPRA'); setErrorMsg(null); }}
-              className={`py-2.5 rounded-lg text-sm font-bold transition-all ${
+              className={`py-3 rounded-xl text-xs font-bold transition-all ${
                 orderType === 'COMPRA'
-                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-950/40'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-glow-emerald'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
               }`}
             >
               COMPRAR (Verde)
@@ -138,10 +134,10 @@ function BoletaContent() {
             <button
               type="button"
               onClick={() => { setOrderType('VENDA'); setErrorMsg(null); }}
-              className={`py-2.5 rounded-lg text-sm font-bold transition-all ${
+              className={`py-3 rounded-xl text-xs font-bold transition-all ${
                 orderType === 'VENDA'
-                  ? 'bg-red-600 text-white shadow-md shadow-red-950/40'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                  ? 'bg-gradient-to-r from-rose-600 to-red-500 text-white shadow-md'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
               }`}
             >
               VENDER (Vermelho)
@@ -150,15 +146,15 @@ function BoletaContent() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             
-            {/* Asset Selector Dropdown */}
+            {/* Asset Selector */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300">
-                Selecione o Ativo
+              <label className="text-xs font-bold text-slate-300">
+                Ativo Selecionado
               </label>
               <select
                 value={selectedTicker}
                 onChange={(e) => { setSelectedTicker(e.target.value); setErrorMsg(null); }}
-                className="w-full rounded-xl bg-slate-800/90 border border-slate-700 px-4 py-2.5 text-sm font-bold text-white focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-2xl bg-[#090E23] border border-white/[0.1] px-4 py-3 text-sm font-bold text-white focus:border-cyan-400 focus:outline-none"
               >
                 {assets.map((a) => (
                   <option key={a.ticker} value={a.ticker}>
@@ -169,20 +165,20 @@ function BoletaContent() {
             </div>
 
             {/* Price Preview */}
-            <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-xs">
-              <div className="text-slate-400">Cotação Atual de Mercado:</div>
-              <div className="font-bold text-white text-sm">{formatCurrency(asset.price)}</div>
+            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-xs">
+              <span className="text-slate-400">Cotação Atual de Pregão:</span>
+              <span className="font-bold text-white text-sm font-mono">{formatCurrency(asset.price)}</span>
             </div>
 
             {/* Quantity Input */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-slate-300">
+                <label className="text-xs font-bold text-slate-300">
                   Quantidade
                 </label>
                 <span className="text-[11px] text-slate-400">
                   {orderType === 'COMPRA'
-                    ? `Disponível em Caixa: ${formatCurrency(summary.cash)}`
+                    ? `Caixa Livre: ${formatCurrency(summary.cash)}`
                     : `Em Custódia: ${position?.quantity || 0} ${asset.ticker}`}
                 </span>
               </div>
@@ -193,45 +189,45 @@ function BoletaContent() {
                 required
                 value={quantity}
                 onChange={(e) => { setQuantity(e.target.value); setErrorMsg(null); }}
-                className="w-full rounded-xl bg-slate-800/90 border border-slate-700 px-4 py-2.5 text-base font-bold text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-2xl bg-white/[0.04] border border-white/[0.1] px-4 py-3 text-base font-bold text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none font-mono"
               />
             </div>
 
             {/* Percentage Quick Selector */}
-            <div className="flex items-center gap-2">
+            <div className="grid grid-cols-4 gap-2">
               {[25, 50, 75, 100].map((pct) => (
                 <button
                   key={pct}
                   type="button"
                   onClick={() => handlePercentClick(pct)}
-                  className="flex-1 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors"
+                  className="py-2 rounded-xl text-xs font-bold bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/[0.08] transition-colors"
                 >
                   {pct}%
                 </button>
               ))}
             </div>
 
-            {/* Error Message if any */}
+            {/* Error Message */}
             {errorMsg && (
-              <div className="p-3 rounded-xl bg-red-950/60 border border-red-500/40 text-xs text-red-200 flex items-start gap-2">
-                <AlertTriangle className="h-4 w-4 text-red-400 flex-shrink-0 mt-0.5" />
+              <div className="p-3.5 rounded-2xl bg-rose-950/60 border border-rose-500/40 text-xs text-rose-200 flex items-start gap-2">
+                <AlertTriangle className="h-4 w-4 text-rose-400 flex-shrink-0 mt-0.5" />
                 <span>{errorMsg}</span>
               </div>
             )}
 
             {/* Total Order Summary Box */}
-            <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2 text-xs">
+            <div className="p-4 rounded-2xl bg-black/40 border border-white/[0.08] space-y-2 text-xs">
               <div className="flex items-center justify-between text-slate-400">
-                <span>Valor Bruto da Ordem:</span>
-                <span className="text-white font-medium">{formatCurrency(totalOrderValue)}</span>
+                <span>Valor Operacional Bruto:</span>
+                <span className="text-white font-mono">{formatCurrency(totalOrderValue)}</span>
               </div>
               <div className="flex items-center justify-between text-slate-400">
-                <span>Taxa de Corretagem B3 (Simulador):</span>
-                <span className="text-emerald-400 font-semibold">R$ 0,00 (Gratuito)</span>
+                <span>Corretagem Simulador:</span>
+                <span className="text-emerald-400 font-bold">R$ 0,00 (Isento)</span>
               </div>
-              <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-sm">
+              <div className="pt-2 border-t border-white/[0.08] flex items-center justify-between text-sm">
                 <span className="font-bold text-slate-200">Total a Liquidar:</span>
-                <span className={`font-black ${orderType === 'COMPRA' ? 'text-emerald-400' : 'text-blue-400'}`}>
+                <span className={`font-black font-mono text-base ${orderType === 'COMPRA' ? 'text-emerald-400' : 'text-cyan-400'}`}>
                   {formatCurrency(totalOrderValue)}
                 </span>
               </div>
@@ -240,73 +236,69 @@ function BoletaContent() {
             {/* Submit Button */}
             <button
               type="submit"
-              className={`w-full py-3.5 px-4 rounded-xl text-sm font-bold text-white shadow-lg transition-all ${
+              className={`w-full py-4 px-4 rounded-2xl text-sm font-bold text-white shadow-lg transition-all ${
                 orderType === 'COMPRA'
-                  ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-950/40'
-                  : 'bg-red-600 hover:bg-red-500 shadow-red-950/40'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 shadow-glow-emerald'
+                  : 'bg-gradient-to-r from-rose-600 to-red-500 hover:from-rose-500 hover:to-red-400 shadow-md'
               }`}
             >
-              Confirmar Ordem Simulada de {orderType === 'COMPRA' ? 'Compra' : 'Venda'}
+              Confirmar Ordem de {orderType === 'COMPRA' ? 'Compra' : 'Venda'}
             </button>
 
           </form>
 
         </div>
 
-        {/* Right Column: Educational Risk Simulator */}
+        {/* Right Column: Educational Risk Simulator (5 cols) */}
         <div className="md:col-span-5 space-y-4">
           
-          {/* Risk Impact Card */}
-          <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-4 shadow-xl">
+          <div className="p-6 rounded-[28px] bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl shadow-glass space-y-4">
             <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center">
+              <div className="h-8 w-8 rounded-xl bg-blue-500/20 text-cyan-400 flex items-center justify-center">
                 <GraduationCap className="h-4 w-4" />
               </div>
               <h3 className="font-bold text-sm text-white">
-                Simulador de Risco Bahia Capital
+                Simulador de Concentração
               </h3>
             </div>
 
-            {/* Allocation Meter */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400">Concentração desta Ordem:</span>
-                <span className={`font-bold ${isHighRisk ? 'text-amber-400' : 'text-emerald-400'}`}>
-                  {portfolioImpactPercent.toFixed(1)}% do Patrimônio
+                <span className="text-slate-400">Peso na Carteira:</span>
+                <span className={`font-bold font-mono ${isHighRisk ? 'text-amber-400' : 'text-emerald-400'}`}>
+                  {portfolioImpactPercent.toFixed(1)}%
                 </span>
               </div>
 
-              {/* Progress bar */}
-              <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
+              <div className="h-2.5 w-full rounded-full bg-white/[0.06] overflow-hidden">
                 <div
-                  className={`h-full transition-all duration-300 ${
+                  className={`h-full transition-all duration-300 rounded-full ${
                     portfolioImpactPercent > 40
-                      ? 'bg-red-500'
+                      ? 'bg-rose-500'
                       : portfolioImpactPercent > 20
                       ? 'bg-amber-400'
-                      : 'bg-emerald-500'
+                      : 'bg-emerald-400'
                   }`}
                   style={{ width: `${Math.min(portfolioImpactPercent, 100)}%` }}
                 />
               </div>
             </div>
 
-            {/* Mentor Alert based on risk */}
             {isHighRisk ? (
-              <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/30 text-xs text-amber-200 space-y-1">
+              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-200 space-y-1">
                 <div className="font-bold flex items-center gap-1.5 text-amber-400">
                   <AlertTriangle className="h-4 w-4 flex-shrink-0" />
-                  <span>Atenção à Concentração</span>
+                  <span>Alerta de Concentração</span>
                 </div>
                 <p className="leading-relaxed">
-                  Esta ordem alocará mais de 25% da sua carteira em um único ativo. Na consultoria recomendamos não ultrapassar 15% a 20% para manter uma blindagem patrimonial saudável.
+                  Esta ordem alocará mais de 25% do seu patrimônio em um único ativo. Recomendamos não concentrar para evitar oscilações severas.
                 </p>
               </div>
             ) : (
-              <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-xs text-emerald-200 space-y-1">
+              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-xs text-emerald-200 space-y-1">
                 <div className="font-bold flex items-center gap-1.5 text-emerald-400">
                   <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
-                  <span>Alocação Prudente</span>
+                  <span>Alocação Segura</span>
                 </div>
                 <p className="leading-relaxed">
                   Ordem dentro dos limites recomendados de diversificação para o perfil do investidor iniciante.
@@ -314,23 +306,12 @@ function BoletaContent() {
               </div>
             )}
 
-            <div className="text-[11px] text-slate-400 border-t border-slate-800 pt-3 space-y-1">
-              <div>• Cotação executada: <strong>Cotação de Mercado ao Vivo</strong></div>
-              <div>• Liquidação: <strong>Instantânea (Ambiente Sandbox)</strong></div>
-              <div>• Corretagem e Emolumentos: <strong>Isentos para Alunos</strong></div>
+            <div className="text-[11px] text-slate-400 border-t border-white/[0.08] pt-3 space-y-1">
+              <div>• Cotação executada: <strong>Cotação Real ao Vivo</strong></div>
+              <div>• Liquidação: <strong>Instantânea (Sandbox)</strong></div>
+              <div>• Corretagem: <strong>R$ 0,00 Gratuita</strong></div>
             </div>
 
-          </div>
-
-          {/* Quick asset mini snapshot */}
-          <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs space-y-2">
-            <div className="font-semibold text-white flex items-center gap-1.5">
-              <span>{asset.logo}</span>
-              <span>{asset.name} ({asset.ticker})</span>
-            </div>
-            <p className="text-slate-400 text-[11px] leading-relaxed">
-              {asset.description}
-            </p>
           </div>
 
         </div>

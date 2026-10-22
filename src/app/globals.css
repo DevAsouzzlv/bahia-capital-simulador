@@ -4,35 +4,75 @@
 
 :root {
   --foreground-rgb: 248, 250, 252;
-  --background-start-rgb: 15, 23, 42;
-  --background-end-rgb: 15, 23, 42;
+  --background-start-rgb: 6, 10, 23;
+  --background-end-rgb: 4, 7, 16;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: #0F172A;
+  background-color: #060A17;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(0, 102, 255, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(0, 210, 255, 0.12) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
+  background-attachment: fixed;
   min-height: 100vh;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
-/* Custom Scrollbar for modern Fintech Look */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #0F172A;
-}
-::-webkit-scrollbar-thumb {
-  background: #1E293B;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+/* Glass Card Helper */
+@layer components {
+  .glass-card {
+    background: rgba(14, 23, 53, 0.65);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  
+  .glass-card-hover {
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glass-card-hover:hover {
+    background: rgba(20, 32, 72, 0.75);
+    border-color: rgba(0, 210, 255, 0.3);
+    box-shadow: 0 10px 40px -10px rgba(0, 102, 255, 0.25);
+    transform: translateY(-2px);
+  }
+
+  .glass-pill {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-button-glow {
+    background: linear-gradient(135deg, #0066FF 0%, #0044CC 100%);
+    box-shadow: 0 0 25px rgba(0, 102, 255, 0.45);
+    transition: all 0.2s ease;
+  }
+  .glass-button-glow:hover {
+    box-shadow: 0 0 35px rgba(0, 102, 255, 0.65);
+    transform: translateY(-1px);
+  }
 }
 
-/* Accessibility: Clear Focus States */
+/* Smooth Modern Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 210, 255, 0.3);
+}
+
 :focus-visible {
-  outline: 2px solid #3B82F6;
+  outline: 2px solid #00D2FF;
   outline-offset: 2px;
 }
