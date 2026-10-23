@@ -29,7 +29,12 @@ import {
 export function AtivoDetalhesClient({ ticker }: { ticker: string }) {
   const router = useRouter();
   const { assets } = useSimulator();
+  const [mounted, setMounted] = useState(false);
   const [timeframe, setTimeframe] = useState<'1D' | '1S' | '1M' | '1A'>('1D');
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const asset = assets.find((a) => a.ticker === ticker?.toUpperCase()) || assets[0];
   const isPositive = asset.change24h >= 0;
@@ -142,49 +147,56 @@ export function AtivoDetalhesClient({ ticker }: { ticker: string }) {
         </div>
 
         <div className="h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={historicalData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="assetGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={isPositive ? '#00D2FF' : '#FF4757'} stopOpacity={0.45} />
-                  <stop offset="95%" stopColor={isPositive ? '#0066FF' : '#FF4757'} stopOpacity={0.0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
-              <XAxis dataKey="timestamp" stroke="#64748B" fontSize={11} tickLine={false} />
-              <YAxis
-                stroke="#64748B"
-                fontSize={11}
-                domain={['dataMin - 1', 'dataMax + 1']}
-                tickFormatter={(val) => `R$ ${val.toFixed(0)}`}
-                tickLine={false}
-                axisLine={false}
-              />
-              <Tooltip
-                content={({ active, payload, label }) => {
-                  if (active && payload && payload.length) {
-                    return (
-                      <div className="rounded-2xl bg-[#090E23]/95 border border-white/[0.1] p-3 shadow-2xl text-xs space-y-1 backdrop-blur-xl">
-                        <div className="text-slate-400">Horário: {label}</div>
-                        <div className="font-bold text-white text-sm font-mono">
-                          {formatCurrency(Number(payload[0].value))}
+          {!mounted ? (
+            <div className="h-full w-full flex items-center justify-center text-slate-500 text-xs">
+              Carregando gráfico...
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={historicalData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="assetGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={isPositive ? '#00D2FF' : '#FF4757'} stopOpacity={0.45} />
+                    <stop offset="95%" stopColor={isPositive ? '#0066FF' : '#FF4757'} stopOpacity={0.0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
+                <XAxis dataKey="timestamp" stroke="#64748B" fontSize={11} tickLine={false} />
+                <YAxis
+                  stroke="#64748B"
+                  fontSize={11}
+                  width={55}
+                  domain={['dataMin - 1', 'dataMax + 1']}
+                  tickFormatter={(val) => `R$ ${val.toFixed(0)}`}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <Tooltip
+                  content={({ active, payload, label }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="rounded-2xl bg-[#090E23]/95 border border-white/[0.1] p-3 shadow-2xl text-xs space-y-1 backdrop-blur-xl">
+                          <div className="text-slate-400">Horário: {label}</div>
+                          <div className="font-bold text-white text-sm font-mono">
+                            {formatCurrency(Number(payload[0].value))}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  }
-                  return null;
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="price"
-                stroke={isPositive ? '#00D2FF' : '#FF4757'}
-                strokeWidth={3}
-                fillOpacity={1}
-                fill="url(#assetGradient)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="price"
+                  stroke={isPositive ? '#00D2FF' : '#FF4757'}
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#assetGradient)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
 

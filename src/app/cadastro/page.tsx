@@ -21,7 +21,7 @@ import { formatCurrency } from '@/utils/formatters';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { updateUserProfile, setNotification } = useSimulator();
+  const { updateUserProfile, setNotification, login } = useSimulator();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,6 +33,7 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     setTimeout(() => {
+      login(email || 'aluno@bahiacapital.com.br', name || 'Novo Aluno');
       updateUserProfile({
         name: name || 'Novo Aluno',
         email: email || 'aluno@bahiacapital.com.br',

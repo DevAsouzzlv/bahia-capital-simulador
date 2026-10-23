@@ -186,28 +186,28 @@ export async function fetchLiveMarketData(): Promise<Asset[]> {
     if (btcRes.ok) {
       const data = await btcRes.json();
       return INITIAL_ASSETS.map((asset) => {
-        if (asset.ticker === 'BTC' && data.bitcoin) {
+        if (asset.ticker === 'BTC' && data.bitcoin && typeof data.bitcoin.brl === 'number' && data.bitcoin.brl > 0) {
           return {
             ...asset,
             price: data.bitcoin.brl,
             change24h: Number(data.bitcoin.brl_24h_change?.toFixed(2) || asset.change24h),
           };
         }
-        if (asset.ticker === 'ETH' && data.ethereum) {
+        if (asset.ticker === 'ETH' && data.ethereum && typeof data.ethereum.brl === 'number' && data.ethereum.brl > 0) {
           return {
             ...asset,
             price: data.ethereum.brl,
             change24h: Number(data.ethereum.brl_24h_change?.toFixed(2) || asset.change24h),
           };
         }
-        if (asset.ticker === 'SOL' && data.solana) {
+        if (asset.ticker === 'SOL' && data.solana && typeof data.solana.brl === 'number' && data.solana.brl > 0) {
           return {
             ...asset,
             price: data.solana.brl,
             change24h: Number(data.solana.brl_24h_change?.toFixed(2) || asset.change24h),
           };
         }
-        if (asset.ticker === 'ADA' && data.cardano) {
+        if (asset.ticker === 'ADA' && data.cardano && typeof data.cardano.brl === 'number' && data.cardano.brl > 0) {
           return {
             ...asset,
             price: data.cardano.brl,

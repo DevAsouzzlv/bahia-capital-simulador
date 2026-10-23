@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSimulator } from '@/context/SimulatorContext';
 import { OrderType } from '@/types';
 import { formatCurrency, formatPercent } from '@/utils/formatters';
+import { sanitizeTicker, validateOrderQuantity } from '@/utils/security';
 import { 
   ArrowLeft, 
   Wallet, 
@@ -18,23 +19,31 @@ import {
 function BoletaContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const initialTicker = searchParams.get('ticker')?.toUpperCase() || 'PETR4';
 
   const { assets, summary, positions, buyAsset, sellAsset } = useSimulator();
+  const validTickers = useMemo(() => assets.map((a) => a.ticker), [assets]);
+  
+  const initialTicker = useMemo(() => {
+    return sanitizeTicker(searchParams.get('ticker'), validTickers);
+  }, [searchParams, validTickers]);
+
   const [selectedTicker, setSelectedTicker] = useState<string>(initialTicker);
   const [orderType, setOrderType] = useState<OrderType>('COMPRA');
   const [quantity, setQuantity] = useState<string>('10');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
-    const t = searchParams.get('ticker')?.toUpperCase();
-    if (t) setSelectedTicker(t);
-  }, [searchParams]);
+    const rawTicker = searchParams.get('ticker');
+    if (rawTicker) {
+      setSelectedTicker(sanitizeTicker(rawTicker, validTickers));
+    }
+  }, [searchParams, validTickers]);
 
   const asset = assets.find((a) => a.ticker === selectedTicker) || assets[0];
   const position = positions.find((p) => p.ticker === asset.ticker);
   const numericQty = parseFloat(quantity) || 0;
-  const totalOrderValue = numericQty * asset.price;
+  const totalOrderValue = numericQty > 0 ? numericQty * asset.price : 0;
 
   const totalPortfolio = summary.total > 0 ? summary.total : 10000;
   const portfolioImpactPercent = (totalOrderValue / totalPortfolio) * 100;
@@ -43,45 +52,63 @@ function BoletaContent() {
   const handlePercentClick = (percent: number) => {
     if (orderType === 'COMPRA') {
       const availableFunds = summary.cash * (percent / 100);
+      if (asset.price <= 0) return;
+      const rawQty = availableFunds / asset.price;
       const calculatedQty = asset.type === 'ACAO' 
-        ? Math.floor(availableFunds / asset.price)
-        : Number((availableFunds / asset.price).toFixed(4));
-      setQuantity(calculatedQty.toString());
+        ? Math.floor(rawQty)
+        : Math.floor(rawQty * 10000) / 10000;
+      setQuantity(Math.max(0, calculatedQty).toString());
     } else {
       if (!position || position.quantity <= 0) {
         setQuantity('0');
         return;
       }
+      if (percent === 100) {
+        setQuantity(position.quantity.toString());
+        return;
+      }
       const calculatedQty = asset.type === 'ACAO'
         ? Math.floor(position.quantity * (percent / 100))
-        : Number((position.quantity * (percent / 100)).toFixed(4));
-      setQuantity(calculatedQty.toString());
+        : Math.floor(position.quantity * (percent / 100) * 10000) / 10000;
+      setQuantity(Math.max(0, calculatedQty).toString());
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setErrorMsg(null);
 
-    if (numericQty <= 0) {
-      setErrorMsg('Informe uma quantidade válida superior a zero.');
+    // Front-end pre-flight validation
+    const validation = validateOrderQuantity(quantity, asset.type);
+    if (!validation.isValid) {
+      setErrorMsg(validation.error || 'Quantidade inválida.');
       return;
     }
 
-    if (orderType === 'COMPRA') {
-      const res = buyAsset(asset.ticker, numericQty);
-      if (!res.success) {
-        setErrorMsg(res.message);
+    setIsSubmitting(true);
+
+    try {
+      if (orderType === 'COMPRA') {
+        const res = buyAsset(asset.ticker, validation.parsedQuantity);
+        if (!res.success) {
+          setErrorMsg(res.message);
+          setIsSubmitting(false);
+        } else {
+          router.push('/custodia');
+        }
       } else {
-        router.push('/custodia');
+        const res = sellAsset(asset.ticker, validation.parsedQuantity);
+        if (!res.success) {
+          setErrorMsg(res.message);
+          setIsSubmitting(false);
+        } else {
+          router.push('/custodia');
+        }
       }
-    } else {
-      const res = sellAsset(asset.ticker, numericQty);
-      if (!res.success) {
-        setErrorMsg(res.message);
-      } else {
-        router.push('/custodia');
-      }
+    } catch {
+      setErrorMsg('Ocorreu um erro inesperado ao processar a ordem.');
+      setIsSubmitting(false);
     }
   };
 
@@ -188,6 +215,11 @@ function BoletaContent() {
                 min="0"
                 required
                 value={quantity}
+                onKeyDown={(e) => {
+                  if (['-', '+', 'e', 'E'].includes(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
                 onChange={(e) => { setQuantity(e.target.value); setErrorMsg(null); }}
                 className="w-full rounded-2xl bg-white/[0.04] border border-white/[0.1] px-4 py-3 text-base font-bold text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none font-mono"
               />
@@ -199,8 +231,9 @@ function BoletaContent() {
                 <button
                   key={pct}
                   type="button"
+                  disabled={isSubmitting}
                   onClick={() => handlePercentClick(pct)}
-                  className="py-2 rounded-xl text-xs font-bold bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/[0.08] transition-colors"
+                  className="py-2 rounded-xl text-xs font-bold bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/[0.08] transition-colors disabled:opacity-50"
                 >
                   {pct}%
                 </button>
@@ -233,16 +266,19 @@ function BoletaContent() {
               </div>
             </div>
 
-            {/* Submit Button */}
+            {/* Submit Button with Submitting Lock */}
             <button
               type="submit"
-              className={`w-full py-4 px-4 rounded-2xl text-sm font-bold text-white shadow-lg transition-all ${
+              disabled={isSubmitting}
+              className={`w-full py-4 px-4 rounded-2xl text-sm font-bold text-white shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed ${
                 orderType === 'COMPRA'
                   ? 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 shadow-glow-emerald'
                   : 'bg-gradient-to-r from-rose-600 to-red-500 hover:from-rose-500 hover:to-red-400 shadow-md'
               }`}
             >
-              Confirmar Ordem de {orderType === 'COMPRA' ? 'Compra' : 'Venda'}
+              {isSubmitting
+                ? 'Processando Liquidação...'
+                : `Confirmar Ordem de ${orderType === 'COMPRA' ? 'Compra' : 'Venda'}`}
             </button>
 
           </form>

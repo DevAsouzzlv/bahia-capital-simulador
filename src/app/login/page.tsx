@@ -16,7 +16,7 @@ import { formatCurrency } from '@/utils/formatters';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setNotification } = useSimulator();
+  const { setNotification, login } = useSimulator();
   const [email, setEmail] = useState('arthur.souza@bahiacapital.com.br');
   const [password, setPassword] = useState('••••••••');
   const [isLoading, setIsLoading] = useState(false);
@@ -26,6 +26,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     setTimeout(() => {
+      login(email);
       setNotification({
         type: 'success',
         message: 'Login realizado com sucesso! Bem-vindo de volta ao Simulador Bahia Capital.',

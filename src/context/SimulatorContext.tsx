@@ -3,6 +3,15 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { User, Asset, Position, Order, Mission, PortfolioSummary, OrderType } from '@/types';
 import { INITIAL_ASSETS, fetchLiveMarketData } from '@/services/marketData';
+import {
+  roundFinancial,
+  validateOrderQuantity,
+  sanitizeText,
+  safeParseCash,
+  safeParsePositions,
+  safeParseOrders,
+  safeParseUser,
+} from '@/utils/security';
 
 interface SimulatorContextType {
   user: User;
@@ -11,6 +20,9 @@ interface SimulatorContextType {
   orders: Order[];
   missions: Mission[];
   summary: PortfolioSummary;
+  isAuthenticated: boolean;
+  login: (email?: string, name?: string) => void;
+  logout: () => void;
   isResetModalOpen: boolean;
   setIsResetModalOpen: (open: boolean) => void;
   buyAsset: (ticker: string, quantity: number) => { success: boolean; message: string };
@@ -169,10 +181,11 @@ export function SimulatorProvider({ children }: { children: React.ReactNode }) {
   const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
   const [missions, setMissions] = useState<Mission[]>(DEFAULT_MISSIONS);
   const [assets, setAssets] = useState<Asset[]>(INITIAL_ASSETS);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
   const [isResetModalOpen, setIsResetModalOpen] = useState<boolean>(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
 
-  // Load from LocalStorage if available
+  // Safe load from LocalStorage with schema verification & integrity fallbacks
   useEffect(() => {
     try {
       const savedCash = localStorage.getItem('bahia_cash');
@@ -180,14 +193,25 @@ export function SimulatorProvider({ children }: { children: React.ReactNode }) {
       const savedOrders = localStorage.getItem('bahia_orders');
       const savedUser = localStorage.getItem('bahia_user');
       const savedMissions = localStorage.getItem('bahia_missions');
+      const savedAuth = localStorage.getItem('bahia_auth_session');
 
-      if (savedCash !== null) setCash(JSON.parse(savedCash));
-      if (savedPositions !== null) setPositions(JSON.parse(savedPositions));
-      if (savedOrders !== null) setOrders(JSON.parse(savedOrders));
-      if (savedUser !== null) setUser(JSON.parse(savedUser));
-      if (savedMissions !== null) setMissions(JSON.parse(savedMissions));
+      setCash(safeParseCash(savedCash, 6488.50));
+      setPositions(safeParsePositions(savedPositions, INITIAL_POSITIONS));
+      setOrders(safeParseOrders(savedOrders, INITIAL_ORDERS));
+      setUser(safeParseUser(savedUser, DEFAULT_USER));
+      
+      if (savedAuth !== null) {
+        setIsAuthenticated(savedAuth === 'true');
+      }
+
+      if (savedMissions !== null) {
+        try {
+          const parsed = JSON.parse(savedMissions);
+          if (Array.isArray(parsed)) setMissions(parsed);
+        } catch {}
+      }
     } catch {
-      // ignore
+      // Safe fallback already active
     }
   }, []);
 
@@ -199,10 +223,26 @@ export function SimulatorProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem('bahia_orders', JSON.stringify(orders));
       localStorage.setItem('bahia_user', JSON.stringify(user));
       localStorage.setItem('bahia_missions', JSON.stringify(missions));
+      localStorage.setItem('bahia_auth_session', String(isAuthenticated));
     } catch {
       // ignore
     }
-  }, [cash, positions, orders, user, missions]);
+  }, [cash, positions, orders, user, missions, isAuthenticated]);
+
+  const login = useCallback((email?: string, name?: string) => {
+    setIsAuthenticated(true);
+    if (email || name) {
+      setUser((prev) => ({
+        ...prev,
+        email: email ? sanitizeText(email, 120) : prev.email,
+        name: name ? sanitizeText(name, 80) : prev.name,
+      }));
+    }
+  }, []);
+
+  const logout = useCallback(() => {
+    setIsAuthenticated(false);
+  }, []);
 
   // Fetch live market data
   const refreshPrices = useCallback(async () => {
@@ -254,15 +294,19 @@ export function SimulatorProvider({ children }: { children: React.ReactNode }) {
     );
   }, [positions]);
 
-  // Buy Asset
+  // Buy Asset (Hardened against negative values, float drift and race conditions)
   const buyAsset = useCallback(
-    (ticker: string, quantity: number) => {
+    (ticker: string, rawQuantity: number) => {
       const asset = assets.find((a) => a.ticker === ticker);
       if (!asset) return { success: false, message: 'Ativo não encontrado no mercado simulado.' };
 
-      if (quantity <= 0) return { success: false, message: 'A quantidade precisa ser maior que zero.' };
+      const validation = validateOrderQuantity(rawQuantity, asset.type);
+      if (!validation.isValid) {
+        return { success: false, message: validation.error || 'Quantidade inválida para negociação.' };
+      }
+      const quantity = validation.parsedQuantity;
 
-      const totalCost = quantity * asset.price;
+      const totalCost = roundFinancial(quantity * asset.price, 2);
       if (totalCost > cash) {
         return {
           success: false,
@@ -270,19 +314,21 @@ export function SimulatorProvider({ children }: { children: React.ReactNode }) {
         };
       }
 
-      // Deduct cash
-      setCash((prev) => prev - totalCost);
+      // Deduct cash safely with 2 decimals
+      setCash((prev) => roundFinancial(prev - totalCost, 2));
 
       // Update positions
       setPositions((prev) => {
         const existing = prev.find((p) => p.ticker === ticker);
         if (existing) {
-          const newQty = existing.quantity + quantity;
-          const newTotalCost = existing.totalCost + totalCost;
-          const newAveragePrice = newTotalCost / newQty;
-          const currentValue = newQty * asset.price;
-          const profitLoss = currentValue - newTotalCost;
-          const profitLossPercent = (profitLoss / newTotalCost) * 100;
+          const newQty = asset.type === 'ACAO' 
+            ? Math.floor(existing.quantity + quantity)
+            : roundFinancial(existing.quantity + quantity, 6);
+          const newTotalCost = roundFinancial(existing.totalCost + totalCost, 2);
+          const newAveragePrice = roundFinancial(newTotalCost / newQty, 2);
+          const currentValue = roundFinancial(newQty * asset.price, 2);
+          const profitLoss = roundFinancial(currentValue - newTotalCost, 2);
+          const profitLossPercent = newTotalCost > 0 ? roundFinancial((profitLoss / newTotalCost) * 100, 2) : 0;
 
           return prev.map((p) =>
             p.ticker === ticker
@@ -347,11 +393,17 @@ export function SimulatorProvider({ children }: { children: React.ReactNode }) {
     [assets, cash, positions]
   );
 
-  // Sell Asset
+  // Sell Asset (BUG-01 Fix: Hardened against negative quantity asset duplication)
   const sellAsset = useCallback(
-    (ticker: string, quantity: number) => {
+    (ticker: string, rawQuantity: number) => {
       const asset = assets.find((a) => a.ticker === ticker);
       if (!asset) return { success: false, message: 'Ativo não encontrado.' };
+
+      const validation = validateOrderQuantity(rawQuantity, asset.type);
+      if (!validation.isValid) {
+        return { success: false, message: validation.error || 'Quantidade inválida para venda.' };
+      }
+      const quantity = validation.parsedQuantity;
 
       const position = positions.find((p) => p.ticker === ticker);
       if (!position || position.quantity < quantity) {
@@ -361,23 +413,26 @@ export function SimulatorProvider({ children }: { children: React.ReactNode }) {
         };
       }
 
-      const totalSale = quantity * asset.price;
-      const costPortion = (position.totalCost / position.quantity) * quantity;
-      const profitOnSale = totalSale - costPortion;
+      const totalSale = roundFinancial(quantity * asset.price, 2);
+      const costPortion = roundFinancial((position.totalCost / position.quantity) * quantity, 2);
+      const profitOnSale = roundFinancial(totalSale - costPortion, 2);
 
-      // Add cash
-      setCash((prev) => prev + totalSale);
+      // Add cash safely with 2 decimals
+      setCash((prev) => roundFinancial(prev + totalSale, 2));
 
       // Update positions
       setPositions((prev) => {
-        const remainingQty = position.quantity - quantity;
+        const remainingQty = asset.type === 'ACAO'
+          ? Math.floor(position.quantity - quantity)
+          : roundFinancial(position.quantity - quantity, 6);
+
         if (remainingQty <= 0.000001) {
           return prev.filter((p) => p.ticker !== ticker);
         } else {
-          const newTotalCost = position.totalCost - costPortion;
-          const currentValue = remainingQty * asset.price;
-          const profitLoss = currentValue - newTotalCost;
-          const profitLossPercent = (profitLoss / newTotalCost) * 100;
+          const newTotalCost = roundFinancial(Math.max(0, position.totalCost - costPortion), 2);
+          const currentValue = roundFinancial(remainingQty * asset.price, 2);
+          const profitLoss = roundFinancial(currentValue - newTotalCost, 2);
+          const profitLossPercent = newTotalCost > 0 ? roundFinancial((profitLoss / newTotalCost) * 100, 2) : 0;
 
           return prev.map((p) =>
             p.ticker === ticker
@@ -436,7 +491,12 @@ export function SimulatorProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const updateUserProfile = useCallback((data: Partial<User>) => {
-    setUser((prev) => ({ ...prev, ...data }));
+    setUser((prev) => ({
+      ...prev,
+      name: data.name !== undefined ? sanitizeText(data.name, 80) : prev.name,
+      email: data.email !== undefined ? sanitizeText(data.email, 120) : prev.email,
+      investorProfile: data.investorProfile || prev.investorProfile,
+    }));
   }, []);
 
   // Calculate summary
@@ -475,6 +535,9 @@ export function SimulatorProvider({ children }: { children: React.ReactNode }) {
         orders,
         missions,
         summary,
+        isAuthenticated,
+        login,
+        logout,
         isResetModalOpen,
         setIsResetModalOpen,
         buyAsset,

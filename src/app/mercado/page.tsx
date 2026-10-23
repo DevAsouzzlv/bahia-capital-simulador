@@ -47,14 +47,14 @@ export default function MercadoPage() {
   return (
     <div className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
       
-      {/* Real-time Indices Marquee - Glowing Frosted Bar */}
-      <div className="w-full overflow-x-auto py-3 px-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl flex items-center justify-between gap-6 text-xs text-slate-300 shadow-glass">
+      {/* Real-time Indices Marquee */}
+      <div className="w-full overflow-x-auto py-3 px-4 sm:px-5 rounded-2xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl flex items-center justify-between gap-4 sm:gap-6 text-xs text-slate-300 shadow-glass">
         <div className="flex items-center gap-2 text-cyan-400 font-bold text-[11px] uppercase tracking-wider flex-shrink-0">
           <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse flex-shrink-0" />
           <span>Feeds ao Vivo:</span>
         </div>
 
-        <div className="flex items-center gap-6 overflow-x-auto no-scrollbar font-mono">
+        <div className="flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar font-mono text-xs">
           <div className="flex items-center gap-2 whitespace-nowrap">
             <span className="font-bold text-white">IBOVESPA</span>
             <span className="text-slate-300">128.450 pts</span>
@@ -92,7 +92,7 @@ export default function MercadoPage() {
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-300 hover:text-white bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] transition-colors flex-shrink-0 text-[11px] font-bold"
         >
           <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin text-cyan-400' : ''}`} />
-          <span>Atualizar</span>
+          <span className="hidden sm:inline">Atualizar</span>
         </button>
       </div>
 
@@ -120,8 +120,8 @@ export default function MercadoPage() {
         </div>
       </div>
 
-      {/* Filter Tabs - Nexora / FitRise Pill Selection */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+      {/* Filter Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 max-w-full">
         {[
           { id: 'TODAS', label: 'Todos os Ativos' },
           { id: 'ACAO', label: 'Ações B3' },
@@ -133,7 +133,7 @@ export default function MercadoPage() {
             key={tab.id}
             type="button"
             onClick={() => setActiveFilter(tab.id as any)}
-            className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all ${
+            className={`px-3.5 sm:px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all ${
               activeFilter === tab.id
                 ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-glow-blue'
                 : 'bg-white/[0.03] text-slate-400 hover:text-white border border-white/[0.08] hover:bg-white/[0.06]'
@@ -144,9 +144,71 @@ export default function MercadoPage() {
         ))}
       </div>
 
-      {/* Assets Table in Glass Card */}
+      {/* Assets Container */}
       <div className="rounded-[28px] bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl shadow-glass overflow-hidden">
-        <div className="overflow-x-auto">
+        
+        {/* Mobile Cards View */}
+        <div className="block md:hidden divide-y divide-white/[0.05]">
+          {filteredAssets.map((asset) => {
+            const isPositive = asset.change24h >= 0;
+            return (
+              <div key={asset.ticker} className="p-4 space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <Link href={`/ativo/${asset.ticker}`} className="flex items-center gap-3 min-w-0">
+                    <div className="h-10 w-10 rounded-2xl bg-[#0B1433] border border-white/[0.1] flex items-center justify-center text-lg flex-shrink-0 shadow-inner">
+                      {asset.logo}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-bold text-white text-sm truncate flex items-center gap-1.5">
+                        {asset.ticker}
+                        <span className="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded-full bg-white/[0.04] text-cyan-300 border border-white/[0.08]">
+                          {asset.type === 'ACAO' ? 'B3' : 'Cripto'}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-slate-400 truncate">{asset.name}</div>
+                    </div>
+                  </Link>
+
+                  <div className="text-right flex-shrink-0">
+                    <div className="font-mono font-bold text-white text-sm">
+                      {formatCurrency(asset.price)}
+                    </div>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      isPositive
+                        ? 'bg-emerald-500/15 text-emerald-400'
+                        : 'bg-rose-500/15 text-rose-400'
+                    }`}>
+                      {isPositive ? <TrendingUp className="h-2.5 w-2.5" /> : <TrendingDown className="h-2.5 w-2.5" />}
+                      <span>{formatPercent(asset.change24h)}</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-1 text-xs">
+                  <span className="text-slate-400 font-mono text-[11px]">Vol: {asset.volume}</span>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/ativo/${asset.ticker}`}
+                      className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-300 bg-white/[0.05] border border-white/[0.08]"
+                    >
+                      Raio-X
+                    </Link>
+                    <Link
+                      href={`/negociar?ticker=${asset.ticker}`}
+                      className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 shadow-glow-blue"
+                    >
+                      <span>Negociar</span>
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-white/[0.08] bg-white/[0.02] text-slate-400 uppercase text-[10px] tracking-wider font-semibold">
@@ -244,6 +306,7 @@ export default function MercadoPage() {
             </tbody>
           </table>
         </div>
+
       </div>
 
     </div>

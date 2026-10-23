@@ -80,7 +80,7 @@ export default function DashboardPage() {
               Patrimônio Total da Carteira (Simulado)
             </div>
 
-            <div className="text-4xl sm:text-5xl lg:text-6xl font-heading font-black tracking-tight text-white">
+            <div className="text-3xl sm:text-5xl lg:text-6xl font-heading font-black tracking-tight text-white break-words">
               {formatCurrency(summary.total)}
             </div>
 
@@ -203,21 +203,21 @@ export default function DashboardPage() {
                       href={`/ativo/${pos.ticker}`}
                       className="flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.06] hover:border-cyan-500/30 transition-all group"
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
                         <div className="h-10 w-10 rounded-2xl bg-[#0B1433] border border-white/[0.1] flex items-center justify-center text-sm font-bold text-white shadow-inner flex-shrink-0 group-hover:scale-105 transition-transform">
                           {pos.type === 'ACAO' ? '📈' : '🪙'}
                         </div>
-                        <div>
-                          <div className="font-bold text-white text-sm group-hover:text-cyan-400 transition-colors">
+                        <div className="min-w-0">
+                          <div className="font-bold text-white text-sm group-hover:text-cyan-400 transition-colors truncate">
                             {pos.name}
                           </div>
-                          <div className="text-[11px] text-slate-400 font-mono">
+                          <div className="text-[11px] text-slate-400 font-mono truncate">
                             {pos.ticker} • {pos.quantity} un
                           </div>
                         </div>
                       </div>
 
-                      <div className="text-right">
+                      <div className="text-right flex-shrink-0 ml-2">
                         <div className="font-mono font-bold text-white text-sm">
                           {formatCurrency(pos.currentValue)}
                         </div>

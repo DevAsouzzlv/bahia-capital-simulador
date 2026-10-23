@@ -92,99 +92,168 @@ export default function HistoricoPage() {
         ))}
       </div>
 
-      {/* Orders Table */}
+      {/* Orders Table & Mobile Cards */}
       <div className="rounded-[28px] bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl shadow-glass overflow-hidden">
         {filteredOrders.length === 0 ? (
           <div className="p-12 text-center text-slate-400 text-sm">
             Nenhuma operação encontrada para o filtro selecionado.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-white/[0.08] bg-white/[0.02] text-slate-400 uppercase text-[10px] tracking-wider font-semibold">
-                  <th className="py-4 pl-5">Data / Hora</th>
-                  <th className="py-4">Ativo</th>
-                  <th className="py-4">Tipo</th>
-                  <th className="py-4 text-right">Qtd</th>
-                  <th className="py-4 text-right">Preço Unitário</th>
-                  <th className="py-4 text-right">Total</th>
-                  <th className="py-4 text-center">Corretagem</th>
-                  <th className="py-4 text-center">Status</th>
-                  <th className="py-4 text-right pr-5">Nota</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/[0.05]">
-                {filteredOrders.map((ord) => {
-                  const isBuy = ord.type === 'COMPRA';
-                  return (
-                    <tr key={ord.id} className="hover:bg-white/[0.04] transition-colors">
-                      
-                      <td className="py-4 pl-5 text-slate-400 font-mono text-[11px]">
-                        {formatDate(ord.executedAt)}
-                      </td>
-
-                      <td className="py-4 font-bold text-white">
-                        <div className="flex items-center gap-1.5">
-                          <span>{ord.ticker}</span>
-                          <span className="text-[10px] text-slate-400 font-normal hidden sm:inline">
-                            ({ord.name})
-                          </span>
+          <>
+            {/* Mobile View: Cards */}
+            <div className="block md:hidden divide-y divide-white/[0.06] p-2">
+              {filteredOrders.map((ord) => {
+                const isBuy = ord.type === 'COMPRA';
+                return (
+                  <div key={ord.id} className="p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="h-9 w-9 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center font-bold text-white text-xs font-mono">
+                          {ord.ticker.slice(0, 4)}
                         </div>
-                      </td>
+                        <div>
+                          <div className="font-bold text-white text-sm flex items-center gap-1.5">
+                            <span>{ord.ticker}</span>
+                            <span className="text-[10px] text-slate-400 font-normal">({ord.name})</span>
+                          </div>
+                          <div className="text-[10px] text-slate-400 font-mono">
+                            {formatDate(ord.executedAt)}
+                          </div>
+                        </div>
+                      </div>
 
-                      <td className="py-4">
-                        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold ${
-                          isBuy
-                            ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                            : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
-                        }`}>
-                          {isBuy ? <ArrowDownLeft className="h-3 w-3" /> : <ArrowUpRight className="h-3 w-3" />}
-                          <span>{ord.type}</span>
-                        </span>
-                      </td>
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                        isBuy
+                          ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                          : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
+                      }`}>
+                        {isBuy ? <ArrowDownLeft className="h-3 w-3" /> : <ArrowUpRight className="h-3 w-3" />}
+                        <span>{ord.type}</span>
+                      </span>
+                    </div>
 
-                      <td className="py-4 text-right text-slate-200 font-mono font-medium">
-                        {ord.quantity}
-                      </td>
+                    <div className="grid grid-cols-3 gap-2 bg-black/30 p-2.5 rounded-xl border border-white/[0.04] text-[11px]">
+                      <div>
+                        <div className="text-slate-400 text-[10px]">Qtd</div>
+                        <div className="font-bold text-white font-mono">{ord.quantity}</div>
+                      </div>
+                      <div>
+                        <div className="text-slate-400 text-[10px]">Preço Unit.</div>
+                        <div className="font-mono text-slate-200">{formatCurrency(ord.unitPrice)}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-slate-400 text-[10px]">Total</div>
+                        <div className="font-mono font-bold text-white">{formatCurrency(ord.totalValue)}</div>
+                      </div>
+                    </div>
 
-                      <td className="py-4 text-right text-slate-300 font-mono">
-                        {formatCurrency(ord.unitPrice)}
-                      </td>
+                    <div className="flex items-center justify-between pt-1">
+                      <div className="flex items-center gap-1.5 text-[11px] text-emerald-400 font-semibold">
+                        <CheckCircle2 className="h-3.5 w-3.5 flex-shrink-0" />
+                        <span>Executada • Isento</span>
+                      </div>
 
-                      <td className="py-4 text-right font-bold text-white font-mono">
-                        {formatCurrency(ord.totalValue)}
-                      </td>
+                      <button
+                        onClick={() => setSelectedOrderForNote(ord)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 transition-colors"
+                      >
+                        <FileText className="h-3.5 w-3.5" />
+                        <span>Nota Fiscal</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
 
-                      <td className="py-4 text-center">
-                        <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                          R$ 0,00
-                        </span>
-                      </td>
+            {/* Desktop View: Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-white/[0.08] bg-white/[0.02] text-slate-400 uppercase text-[10px] tracking-wider font-semibold">
+                    <th className="py-4 pl-5">Data / Hora</th>
+                    <th className="py-4">Ativo</th>
+                    <th className="py-4">Tipo</th>
+                    <th className="py-4 text-right">Qtd</th>
+                    <th className="py-4 text-right">Preço Unitário</th>
+                    <th className="py-4 text-right">Total</th>
+                    <th className="py-4 text-center">Corretagem</th>
+                    <th className="py-4 text-center">Status</th>
+                    <th className="py-4 text-right pr-5">Nota</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.05]">
+                  {filteredOrders.map((ord) => {
+                    const isBuy = ord.type === 'COMPRA';
+                    return (
+                      <tr key={ord.id} className="hover:bg-white/[0.04] transition-colors">
+                        
+                        <td className="py-4 pl-5 text-slate-400 font-mono text-[11px]">
+                          {formatDate(ord.executedAt)}
+                        </td>
 
-                      <td className="py-4 text-center">
-                        <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-semibold">
-                          <CheckCircle2 className="h-3.5 w-3.5" />
-                          <span>Executada</span>
-                        </span>
-                      </td>
+                        <td className="py-4 font-bold text-white">
+                          <div className="flex items-center gap-1.5">
+                            <span>{ord.ticker}</span>
+                            <span className="text-[10px] text-slate-400 font-normal hidden sm:inline">
+                              ({ord.name})
+                            </span>
+                          </div>
+                        </td>
 
-                      <td className="py-4 text-right pr-5">
-                        <button
-                          onClick={() => setSelectedOrderForNote(ord)}
-                          className="p-2 rounded-xl text-slate-400 hover:text-white bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.08] transition-colors"
-                          title="Ver Nota de Corretagem"
-                        >
-                          <FileText className="h-4 w-4" />
-                        </button>
-                      </td>
+                        <td className="py-4">
+                          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold ${
+                            isBuy
+                              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                              : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
+                          }`}>
+                            {isBuy ? <ArrowDownLeft className="h-3 w-3" /> : <ArrowUpRight className="h-3 w-3" />}
+                            <span>{ord.type}</span>
+                          </span>
+                        </td>
 
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                        <td className="py-4 text-right text-slate-200 font-mono font-medium">
+                          {ord.quantity}
+                        </td>
+
+                        <td className="py-4 text-right text-slate-300 font-mono">
+                          {formatCurrency(ord.unitPrice)}
+                        </td>
+
+                        <td className="py-4 text-right font-bold text-white font-mono">
+                          {formatCurrency(ord.totalValue)}
+                        </td>
+
+                        <td className="py-4 text-center">
+                          <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                            R$ 0,00
+                          </span>
+                        </td>
+
+                        <td className="py-4 text-center">
+                          <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-semibold">
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            <span>Executada</span>
+                          </span>
+                        </td>
+
+                        <td className="py-4 text-right pr-5">
+                          <button
+                            onClick={() => setSelectedOrderForNote(ord)}
+                            className="p-2 rounded-xl text-slate-400 hover:text-white bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.08] transition-colors"
+                            title="Ver Nota de Corretagem"
+                          >
+                            <FileText className="h-4 w-4" />
+                          </button>
+                        </td>
+
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 

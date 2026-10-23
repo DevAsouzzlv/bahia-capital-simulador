@@ -8,6 +8,10 @@
   --background-end-rgb: 4, 7, 16;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background-color: #060A17;
@@ -15,8 +19,9 @@ body {
     radial-gradient(at 0% 0%, rgba(0, 102, 255, 0.15) 0px, transparent 50%),
     radial-gradient(at 100% 0%, rgba(0, 210, 255, 0.12) 0px, transparent 50%),
     radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
-  background-attachment: fixed;
+  background-repeat: no-repeat;
   min-height: 100vh;
+  overflow-x: hidden;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 

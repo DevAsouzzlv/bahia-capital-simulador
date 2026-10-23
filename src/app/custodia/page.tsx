@@ -32,7 +32,7 @@ export default function CustodiaPage() {
             </h1>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-xs font-bold">
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 flex-shrink-0 animate-pulse" />
-              {positions.length} Ativos em Carteira
+              {positions.length} Ativos
             </span>
           </div>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
@@ -52,7 +52,7 @@ export default function CustodiaPage() {
       {/* Custody Summary Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         
-        <div className="p-6 rounded-[28px] bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl shadow-glass space-y-1">
+        <div className="p-5 sm:p-6 rounded-[28px] bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl shadow-glass space-y-1">
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
             Total em Ativos
           </span>
@@ -64,7 +64,7 @@ export default function CustodiaPage() {
           </p>
         </div>
 
-        <div className="p-6 rounded-[28px] bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl shadow-glass space-y-1">
+        <div className="p-5 sm:p-6 rounded-[28px] bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl shadow-glass space-y-1">
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
             Reserva em Caixa Livre
           </span>
@@ -76,7 +76,7 @@ export default function CustodiaPage() {
           </p>
         </div>
 
-        <div className="p-6 rounded-[28px] bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl shadow-glass space-y-1">
+        <div className="p-5 sm:p-6 rounded-[28px] bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl shadow-glass space-y-1">
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
             Resultado Não Realizado
           </span>
@@ -90,7 +90,7 @@ export default function CustodiaPage() {
 
       </div>
 
-      {/* Custody Table in Glass Card */}
+      {/* Custody List Container */}
       <div className="rounded-[28px] bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl shadow-glass overflow-hidden">
         {positions.length === 0 ? (
           <div className="p-12 text-center space-y-4">
@@ -110,114 +110,193 @@ export default function CustodiaPage() {
             </Link>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-white/[0.08] bg-white/[0.02] text-slate-400 uppercase text-[10px] tracking-wider font-semibold">
-                  <th className="py-4 pl-5">Ativo</th>
-                  <th className="py-4 text-right">Qtd</th>
-                  <th className="py-4 text-right">Preço Médio</th>
-                  <th className="py-4 text-right">Cotação Atual</th>
-                  <th className="py-4 text-right">Total Investido</th>
-                  <th className="py-4 text-right">Valor Atual</th>
-                  <th className="py-4 text-right">Lucro/Prej.</th>
-                  <th className="py-4 text-right">% Carteira</th>
-                  <th className="py-4 text-right pr-5">Ações Rápidas</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/[0.05]">
-                {positions.map((pos) => {
-                  const isProfit = pos.profitLoss >= 0;
-                  const weight = (pos.currentValue / totalPortfolio) * 100;
-
-                  return (
-                    <tr key={pos.ticker} className="hover:bg-white/[0.04] transition-colors">
-                      
-                      {/* Ativo */}
-                      <td className="py-4 pl-5">
-                        <Link href={`/ativo/${pos.ticker}`} className="flex items-center gap-3 group">
-                          <div className="h-10 w-10 rounded-2xl bg-[#0B1433] border border-white/[0.1] flex items-center justify-center text-xs font-bold text-white group-hover:scale-105 transition-transform">
-                            {pos.type === 'ACAO' ? '📈' : '🪙'}
-                          </div>
-                          <div>
-                            <div className="font-bold text-white text-sm group-hover:text-cyan-400 transition-colors">
-                              {pos.ticker}
-                            </div>
-                            <div className="text-[10px] text-slate-400">{pos.name}</div>
-                          </div>
-                        </Link>
-                      </td>
-
-                      {/* Quantidade */}
-                      <td className="py-4 text-right font-mono font-medium text-slate-200">
-                        {pos.quantity}
-                      </td>
-
-                      {/* Preço Médio */}
-                      <td className="py-4 text-right text-slate-400 font-mono">
-                        {formatCurrency(pos.averagePrice)}
-                      </td>
-
-                      {/* Cotação Atual */}
-                      <td className="py-4 text-right font-mono font-bold text-white">
-                        {formatCurrency(pos.currentPrice)}
-                      </td>
-
-                      {/* Total Investido */}
-                      <td className="py-4 text-right text-slate-400 font-mono">
-                        {formatCurrency(pos.totalCost)}
-                      </td>
-
-                      {/* Valor Atual */}
-                      <td className="py-4 text-right font-mono font-bold text-white">
-                        {formatCurrency(pos.currentValue)}
-                      </td>
-
-                      {/* Lucro/Prejuízo */}
-                      <td className="py-4 text-right">
-                        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold ${
-                          isProfit
-                            ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                            : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
-                        }`}>
-                          {isProfit ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                          <span>{isProfit ? '+' : ''}{formatCurrency(pos.profitLoss)} ({formatPercent(pos.profitLossPercent)})</span>
-                        </span>
-                      </td>
-
-                      {/* % Carteira */}
-                      <td className="py-4 text-right font-mono font-bold">
-                        <span className={weight > 25 ? 'text-amber-400' : 'text-slate-300'}>
-                          {weight.toFixed(1)}%
-                        </span>
-                      </td>
-
-                      {/* Ações Rápidas */}
-                      <td className="py-4 text-right pr-5">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <Link
-                            href={`/negociar?ticker=${pos.ticker}`}
-                            title="Comprar mais"
-                            className="p-2 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500 hover:text-white transition-all"
-                          >
-                            <Plus className="h-3.5 w-3.5" />
-                          </Link>
-                          <Link
-                            href={`/negociar?ticker=${pos.ticker}`}
-                            title="Vender"
-                            className="p-2 rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/30 hover:bg-rose-500 hover:text-white transition-all"
-                          >
-                            <Minus className="h-3.5 w-3.5" />
-                          </Link>
+          <>
+            {/* Mobile Cards View (Visible on small screens) */}
+            <div className="block md:hidden divide-y divide-white/[0.05]">
+              {positions.map((pos) => {
+                const isProfit = pos.profitLoss >= 0;
+                const weight = (pos.currentValue / totalPortfolio) * 100;
+                return (
+                  <div key={pos.ticker} className="p-4 space-y-3.5">
+                    {/* Header: Asset + Action buttons */}
+                    <div className="flex items-center justify-between gap-3">
+                      <Link href={`/ativo/${pos.ticker}`} className="flex items-center gap-3 min-w-0">
+                        <div className="h-10 w-10 rounded-2xl bg-[#0B1433] border border-white/[0.1] flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+                          {pos.type === 'ACAO' ? '📈' : '🪙'}
                         </div>
-                      </td>
+                        <div className="min-w-0">
+                          <div className="font-bold text-white text-sm truncate flex items-center gap-1.5">
+                            {pos.ticker}
+                            <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/60 px-1.5 py-0.2 rounded border border-cyan-800/40">
+                              {weight.toFixed(1)}%
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-slate-400 truncate">{pos.name}</div>
+                        </div>
+                      </Link>
 
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                      {/* Buy / Sell buttons */}
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <Link
+                          href={`/negociar?ticker=${pos.ticker}`}
+                          title="Comprar mais"
+                          className="p-2 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500 hover:text-white transition-all"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Link>
+                        <Link
+                          href={`/negociar?ticker=${pos.ticker}`}
+                          title="Vender"
+                          className="p-2 rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/30 hover:bg-rose-500 hover:text-white transition-all"
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Link>
+                      </div>
+                    </div>
+
+                    {/* Stats 2x2 Grid */}
+                    <div className="grid grid-cols-2 gap-2 text-xs bg-white/[0.02] p-3 rounded-2xl border border-white/[0.05]">
+                      <div>
+                        <span className="text-[10px] text-slate-400 uppercase font-semibold">Quantidade</span>
+                        <div className="font-mono font-bold text-white">{pos.quantity} un</div>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 uppercase font-semibold">Preço Médio</span>
+                        <div className="font-mono text-slate-300">{formatCurrency(pos.averagePrice)}</div>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 uppercase font-semibold">Valor Atual</span>
+                        <div className="font-mono font-bold text-white">{formatCurrency(pos.currentValue)}</div>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 uppercase font-semibold">Lucro / Prejuízo</span>
+                        <div>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            isProfit
+                              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                              : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
+                          }`}>
+                            {isProfit ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                            <span>{isProfit ? '+' : ''}{formatCurrency(pos.profitLoss)} ({formatPercent(pos.profitLossPercent)})</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop Full Table View (Hidden on mobile) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-white/[0.08] bg-white/[0.02] text-slate-400 uppercase text-[10px] tracking-wider font-semibold">
+                    <th className="py-4 pl-5">Ativo</th>
+                    <th className="py-4 text-right">Qtd</th>
+                    <th className="py-4 text-right">Preço Médio</th>
+                    <th className="py-4 text-right">Cotação Atual</th>
+                    <th className="py-4 text-right">Total Investido</th>
+                    <th className="py-4 text-right">Valor Atual</th>
+                    <th className="py-4 text-right">Lucro/Prej.</th>
+                    <th className="py-4 text-right">% Carteira</th>
+                    <th className="py-4 text-right pr-5">Ações Rápidas</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.05]">
+                  {positions.map((pos) => {
+                    const isProfit = pos.profitLoss >= 0;
+                    const weight = (pos.currentValue / totalPortfolio) * 100;
+
+                    return (
+                      <tr key={pos.ticker} className="hover:bg-white/[0.04] transition-colors">
+                        
+                        {/* Ativo */}
+                        <td className="py-4 pl-5">
+                          <Link href={`/ativo/${pos.ticker}`} className="flex items-center gap-3 group">
+                            <div className="h-10 w-10 rounded-2xl bg-[#0B1433] border border-white/[0.1] flex items-center justify-center text-xs font-bold text-white group-hover:scale-105 transition-transform flex-shrink-0">
+                              {pos.type === 'ACAO' ? '📈' : '🪙'}
+                            </div>
+                            <div>
+                              <div className="font-bold text-white text-sm group-hover:text-cyan-400 transition-colors">
+                                {pos.ticker}
+                              </div>
+                              <div className="text-[10px] text-slate-400">{pos.name}</div>
+                            </div>
+                          </Link>
+                        </td>
+
+                        {/* Quantidade */}
+                        <td className="py-4 text-right font-mono font-medium text-slate-200">
+                          {pos.quantity}
+                        </td>
+
+                        {/* Preço Médio */}
+                        <td className="py-4 text-right text-slate-400 font-mono">
+                          {formatCurrency(pos.averagePrice)}
+                        </td>
+
+                        {/* Cotação Atual */}
+                        <td className="py-4 text-right font-mono font-bold text-white">
+                          {formatCurrency(pos.currentPrice)}
+                        </td>
+
+                        {/* Total Investido */}
+                        <td className="py-4 text-right text-slate-400 font-mono">
+                          {formatCurrency(pos.totalCost)}
+                        </td>
+
+                        {/* Valor Atual */}
+                        <td className="py-4 text-right font-mono font-bold text-white">
+                          {formatCurrency(pos.currentValue)}
+                        </td>
+
+                        {/* Lucro/Prejuízo */}
+                        <td className="py-4 text-right">
+                          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold ${
+                            isProfit
+                              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                              : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
+                          }`}>
+                            {isProfit ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                            <span>{isProfit ? '+' : ''}{formatCurrency(pos.profitLoss)} ({formatPercent(pos.profitLossPercent)})</span>
+                          </span>
+                        </td>
+
+                        {/* % Carteira */}
+                        <td className="py-4 text-right font-mono font-bold">
+                          <span className={weight > 25 ? 'text-amber-400' : 'text-slate-300'}>
+                            {weight.toFixed(1)}%
+                          </span>
+                        </td>
+
+                        {/* Ações Rápidas */}
+                        <td className="py-4 text-right pr-5">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <Link
+                              href={`/negociar?ticker=${pos.ticker}`}
+                              title="Comprar mais"
+                              className="p-2 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500 hover:text-white transition-all"
+                            >
+                              <Plus className="h-3.5 w-3.5" />
+                            </Link>
+                            <Link
+                              href={`/negociar?ticker=${pos.ticker}`}
+                              title="Vender"
+                              className="p-2 rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/30 hover:bg-rose-500 hover:text-white transition-all"
+                            >
+                              <Minus className="h-3.5 w-3.5" />
+                            </Link>
+                          </div>
+                        </td>
+
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 
